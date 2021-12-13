@@ -1,0 +1,80 @@
+#!/bin/sh
+
+# M122 Backup Script
+# -------------------
+# Gruppe: Studer
+# - Lian Studer
+# - Kris Huber
+# -------------------
+# Datum: 29. Nov 2021
+# -------------------
+
+# Notiz: Dieses Skript kann nur mit einer POSIX-Compliant Shell, 
+# wie z.Bsp Bash oder Zsh verwendet werden.
+
+# Pfad des aktuellen Skripts (backup.sh)
+SCRIPT_PATH=${0%/*}
+
+SOURCE_PATH="$SCRIPT_PATH/../topSrc"
+BACKUP_PATH="$SCRIPT_PATH/../backSrc"
+
+
+# Hilfe-Text, der angezeigt wird, falls ungültige Argumente eingegeben werden
+USAGE_TEXT="backup [-h] -s <source> -d <dest> -p"
+
+# Unix-Getopt Argument Parser
+# Befehle:
+# -h | --help    : Zeigt Hilfe Text an
+# -s | --source  : Source Ordner 
+# -d | --dest    : Backup Ordner
+# -p | --pretend : Generiert eine Log-Datei, ohne die Dateien zu verschieben. (Dry Run)
+VALID_ARGS=$(getopt -o "hs:d:p" --long "help,source:,dest:,pretend" -- "$@")
+
+# Überprüft, ob die Ausführung von 'getopt' bei der Definition von VALID_ARGS erfolgreich war.
+if [[ $? -ne 0 ]]; then
+    exit 1
+fi
+
+eval set -- $VALID_ARGS
+while [ : ]; do
+    case "$1"  in
+        -h | --help)
+            echo $USAGE_TEXT
+            shift
+            ;;
+        -s | --source)
+            echo "$2"
+            shift 2
+            ;;
+        -d | --dest)
+            echo "$2"
+            shift 2
+            ;;
+        --) shift;
+            break
+            ;;
+    esac
+done
+
+function init_log() {
+    filename=$(date '+%Y%m%d_%H%M_Log_Backup.txt')
+    touch $filename
+}
+
+function backup() {
+    init_log
+    mkdir $BACKUP_PATH
+
+    # for x in $(pwd)/*; do
+    #     echo "$x"
+    #     [[ -f "${x}" ]] && cp "${x}" ../
+    #     [[ -d "${x}" ]] && cd "${x}" && backup
+    #     cd ..
+    # done
+
+    for x in $SOURCE_PATH/*; do
+        echo "$x"
+    done
+}
+
+backup
