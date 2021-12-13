@@ -60,9 +60,21 @@ done
 mkdir $BACKUP_PATH    
 
 # Create log file
-filename=$(date '+%Y%m%d_%H%M_Log_Backup.txt')
-touch $filename
-   
+logfile=$(date '+%Y%m%d_%H%M_Log_Backup.txt')
+touch $logfile
+printf "Time\t\tEvent\t\tSource\t\tDestination\t\tStatus\n"
+
+function write_log() {
+    time=$1
+    event=$2
+    source=$3
+    destination=$4
+    status=$5
+
+    printf "$1\t\t$2\t\t$3\t\t$4\t\t$5\n" >> $logfile
+}
+
+
 # Recursive backup function
 function backup() {
     for x in $SOURCE_PATH/*; do
