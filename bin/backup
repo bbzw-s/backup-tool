@@ -69,9 +69,8 @@ function write_log() {
     event=$2
     source=$3
     destination=$4
-    status=$5
 
-    printf "$1\t\t$2\t\t$3\t\t$4\t\t$5\n" >> $logfile
+    printf "$1\t\t$2\t\t$3\t\t$4\n" >> $logfile
 }
 
 
@@ -79,6 +78,7 @@ function write_log() {
 function backup() {
     for x in $SOURCE_PATH/*; do
         echo "Backing up $x"
+        write_log date "File Copy" x "$dest"
         [[ -f "${x}" ]] && cp "${x}" ../
         [[ -d "${x}" ]] && cd "${x}" && backup
         cd ..
