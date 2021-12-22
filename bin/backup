@@ -16,18 +16,19 @@
 SCRIPT_PATH=${0%/*}
 
 SOURCE_PATH="$SCRIPT_PATH/../topSrc"
-BACKUP_PATH="$SCRIPT_PATH/../backSrc"
+BACKUP_PATH="$SCRIPT_PATH/../topDst"
 
 
 # Hilfe-Text, der angezeigt wird, falls ungültige Argumente eingegeben werden
-USAGE_TEXT="backup [-h] -s <source> -d <dest> -p"
+function usage() {
+    echo "backup [-h] -s <source> -d <dest>"
+}
 
 # Unix-Getopt Argument Parser
 # Befehle:
 # -h | --help    : Zeigt Hilfe Text an
 # -s | --source  : Source Ordner 
 # -d | --dest    : Backup Ordner
-# -p | --pretend : Generiert eine Log-Datei, ohne die Dateien zu verschieben. (Dry Run)
 VALID_ARGS=$(getopt -o "hs:d:p" --long "help,source:,dest:,pretend" -- "$@")
 
 # Überprüft, ob die Ausführung von 'getopt' bei der Definition von VALID_ARGS erfolgreich war.
@@ -43,45 +44,53 @@ while [ : ]; do
             shift
             ;;
         -s | --source)
-            echo "$2"
+            SOURCE_PATH=$2
             shift 2
             ;;
         -d | --dest)
-            echo "$2"
+            BACKUP_PATH=$2
             shift 2
             ;;
         --) shift;
             break
             ;;
+        *) echo "Error: Invalid argument: $1."; usage ;;
     esac
 done
 
 # Create the backup folder
-mkdir $BACKUP_PATH    
+if [[ ! -d "$BACKUP_PATH" ]]; then
+    mkdir $BACKUP_PATH    
+fi
 
 # Create log file
-logfile=$(date '+%Y%m%d_%H%M_Log_Backup.txt')
+logfile=$(date '+%Y%m%d_%H%M%S_Log_Backup.txt')
 touch $logfile
-printf "Time\t\tEvent\t\tSource\t\tDestination\t\tStatus\n"
 
 function write_log() {
     time=$1
-    event=$2
-    source=$3
-    destination=$4
+    source=$2
+    destination=$3
 
-    printf "$1\t\t$2\t\t$3\t\t$4\n" >> $logfile
+    printf "Timestamp: $1\t\tSource: $2\t\tDestination: $3\t\tType: $4\n" >> "$logfile"
 }
 
 
 # Recursive backup function
 function backup() {
-    for x in $SOURCE_PATH/*; do
-        echo "Backing up $x"
-        write_log date "File Copy" x "$dest"
-        [[ -f "${x}" ]] && cp "${x}" ../
-        [[ -d "${x}" ]] && cd "${x}" && backup
-        cd ..
+    src_path=$1
+    dst_path=$2
+
+    if [[ ! -d "$dst_path" ]]; then
+        mkdir "$dst_path"
+    fi
+
+    for x in $src_path/*; do
+        type="$(stat --printf=%F "$x")"
+        write_log "$(date '+%d.%m.%Y %H:%M:%S')" "$x" "$dst_path" "$type"
+        [[ -d "$x" ]] && backup "$x" "$dst_path/$(basename $x)"
+        [[ -f "$x" ]] && cp "$x" "$dst_path"
     done
 }
 
+backup $SOURCE_PATH $BACKUP_PATH
