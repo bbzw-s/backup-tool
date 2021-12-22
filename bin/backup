@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # M122 Backup Script
 # -------------------
@@ -8,9 +8,6 @@
 # -------------------
 # Datum: 29. Nov 2021
 # -------------------
-
-# Notiz: Dieses Skript kann nur mit einer POSIX-Compliant Shell, 
-# wie z.Bsp Bash oder Zsh verwendet werden.
 
 # Pfad des aktuellen Skripts (backup.sh)
 SCRIPT_PATH=${0%/*}
