@@ -62,7 +62,7 @@ fi
 
 # Create log file
 logfile=$(date '+%Y%m%d_%H%M%S_Log_Backup.txt')
-touch $logfile
+touch $BACKUP_PATH/$logfile
 
 function write_log() {
     time=$1
@@ -82,12 +82,8 @@ function backup() {
         mkdir "$dst_path"
     fi
 
-    for x in $src_path/*; do
-        type="$(stat --printf=%F "$x")"
-        write_log "$(date '+%d.%m.%Y %H:%M:%S')" "$x" "$dst_path" "$type"
-        [[ -d "$x" ]] && backup "$x" "$dst_path/$(basename $x)"
-        [[ -f "$x" ]] && cp "$x" "$dst_path"
-    done
+    find $src_path -type d -exec mkdir -p "$dst_path"/{} \; -exec printf $(date '+%d.%m.%Y %H:%M:%S')"\t\tCopying Folder\t\t"{}"\t\t\t\tOk\n" >> $BACKUP_PATH/$logfile \;
+    find $dst_path -type f -exec cp {}    "$dst_path"/{} \; -exec printf $(date '+%d.%m.%Y %H:%M:%S')"\t\tCopying File\t\t"{}"\t\t\t\tOk\n"   >> $BACKUP_PATH/$logfile \;
 }
 
 backup $SOURCE_PATH $BACKUP_PATH
