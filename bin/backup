@@ -77,13 +77,19 @@ function write_log() {
 function backup() {
     src_path=$1
     dst_path=$2
+    
 
     if [[ ! -d "$dst_path" ]]; then
         mkdir "$dst_path"
     fi
 
-    find $src_path -type d -exec mkdir -p "$dst_path"/{} \; -exec printf $(date '+%d.%m.%Y %H:%M:%S')"\t\tCopying Folder\t\t"{}"\t\t\t\tOk\n" >> $BACKUP_PATH/$logfile \;
-    find $dst_path -type f -exec cp {}    "$dst_path"/{} \; -exec printf $(date '+%d.%m.%Y %H:%M:%S')"\t\tCopying File\t\t"{}"\t\t\t\tOk\n"   >> $BACKUP_PATH/$logfile \;
+    find $src_path -type d \
+        -exec mkdir -p "$dst_path"/{} \; \
+        -exec printf "$(date '+%d.%m.%Y %H:%M:%S')\t\tCopying Folder\t\t"{}"\t\t\t\tOk\n" >> $BACKUP_PATH/$logfile \;
+
+    find $src_path -type f \
+        -exec cp {} "$dst_path"/{} \; \
+        -exec printf "$(date '+%d.%m.%Y %H:%M:%S')\t\tCopying File\t\t"{}"\t\t\t\tOk\n"   >> $BACKUP_PATH/$logfile \;
 }
 
 backup $SOURCE_PATH $BACKUP_PATH
