@@ -15,7 +15,6 @@ SCRIPT_PATH=${0%/*}
 SOURCE_PATH="$SCRIPT_PATH/../topSrc"
 BACKUP_PATH="$SCRIPT_PATH/../topDst"
 
-
 # Hilfe-Text, der angezeigt wird, falls ungültige Argumente eingegeben werden
 function usage() {
     echo "backup [-h] -s <source> -d <dest>"
@@ -72,17 +71,15 @@ function write_log() {
     printf "Timestamp: $1\t\tSource: $2\t\tDestination: $3\t\tType: $4\n" >> "$logfile"
 }
 
-
-# Recursive backup function
+# Iterative backup function
 function backup() {
     src_path=$1
     dst_path=$2
-    
 
     if [[ ! -d "$dst_path" ]]; then
         mkdir "$dst_path"
     fi
-
+    
     find $src_path -type d \
         -exec mkdir -p "$dst_path"/{} \; \
         -exec printf "$(date '+%d.%m.%Y %H:%M:%S')\t\tCopying Folder\t\t"{}"\t\t\t\tOk\n" >> $BACKUP_PATH/$logfile \;
@@ -92,4 +89,5 @@ function backup() {
         -exec printf "$(date '+%d.%m.%Y %H:%M:%S')\t\tCopying File\t\t"{}"\t\t\t\tOk\n"   >> $BACKUP_PATH/$logfile \;
 }
 
+# Running the Backup
 backup $SOURCE_PATH $BACKUP_PATH
