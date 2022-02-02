@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # M122 Backup Script
 # -------------------
@@ -14,6 +14,8 @@ SCRIPT_PATH=${0%/*}
 
 SOURCE_PATH="$SCRIPT_PATH/../topSrc"
 BACKUP_PATH="$SCRIPT_PATH/../topDst"
+
+USAGE_TEXT="backup [-h] -s <source> -d <dest>"
 
 # Hilfe-Text, der angezeigt wird, falls ungültige Argumente eingegeben werden
 function usage() {
@@ -82,11 +84,15 @@ function backup() {
     
     find $src_path -type d \
         -exec mkdir -p "$dst_path"/{} \; \
-        -exec printf "$(date '+%d.%m.%Y %H:%M:%S')\t\tCopying Folder\t\t"{}"\t\t\t\tOk\n" >> $BACKUP_PATH/$logfile \;
+        -exec printf "$(date '+%d.%m.%Y %H:%M:%S.%N')\t\tCopying Folder\t\t"{}"\t\t\t\tOk\n" >> $BACKUP_PATH/$logfile \;
 
     find $src_path -type f \
         -exec cp {} "$dst_path"/{} \; \
-        -exec printf "$(date '+%d.%m.%Y %H:%M:%S')\t\tCopying File\t\t"{}"\t\t\t\tOk\n"   >> $BACKUP_PATH/$logfile \;
+        -exec printf "$(date '+%d.%m.%Y %H:%M:%S.%N')\t\tCopying File\t\t"{}"\t\t\t\tOk\n"   >> $BACKUP_PATH/$logfile \;
+
+    if [[ -d $dst_path/bin ]]; then
+        rmdir $dst_path/bin
+    fi
 }
 
 # Running the Backup
